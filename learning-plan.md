@@ -1,12 +1,10 @@
-# 5-step Rust learning plan
+# 5-Step Learning Plan: Build a Text-Based CRUD Web App in Rust with SQLite
 
-A **text-based web application in Rust** with a focus on a **simple CRUD (Create, Read, Update, Delete) page** using the **Rocket framework** and **SQLite** as the simplest database for persistence. The plan emphasizes a **learn-by-doing** approach with practical lessons and exercises, and includes detailed instructions for **hosting on a Linux server**. Each step builds toward a functional CRUD app for managing text notes, with hands-on tasks to reinforce learning. The plan assumes basic programming knowledge but little to no Rust experience.
+This guide provides a hands-on, learn-by-doing approach to building a text-based web application in Rust, featuring a CRUD (Create, Read, Update, Delete) interface using the Rocket framework and SQLite database. It includes practical exercises and detailed instructions for hosting on a Linux server. The plan assumes basic programming knowledge but minimal Rust experience and should take ~3-4 weeks to complete.
 
----
+## Step 1: Master Rust Basics for Text Manipulation
 
-### Step 1: Master Rust Basics for Text Manipulation
-
-**Goal**: Learn Rust’s core concepts (ownership, borrowing, structs, and error handling) through exercises focused on text processing, which is essential for a CRUD app.
+**Goal**: Learn Rust’s core concepts (ownership, borrowing, structs, and error handling) through exercises focused on text processing, essential for a CRUD app.
 
 **Lessons**:
 
@@ -28,7 +26,7 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
    }
    ```
 
-   Run in the Rust Playground (play.rust-lang.org).
+   Run in the [Rust Playground](https://play.rust-lang.org).
 2. Create a `Note` struct with `id: i32` and `content: String`. Write a function to truncate notes longer than 50 characters.
 3. Parse a JSON-like string (e.g., `{"id":1,"content":"test"}`) into a `Note` struct using `serde_json`, handling errors with `Result`.
 
@@ -36,9 +34,9 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
 
 ---
 
-### Step 2: Set Up Your Rust Environment
+## Step 2: Set Up Your Rust Environment
 
-**Goal**: Configure your development environment and use Cargo to manage dependencies, preparing for web and database work.
+**Goal**: Configure your development environment and use Cargo to manage dependencies for web and database development.
 
 **Lessons**:
 
@@ -84,7 +82,7 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
 
 ---
 
-### Step 3: Build a CRUD Web Server with Rocket
+## Step 3: Build a CRUD Web Server with Rocket
 
 **Goal**: Use Rocket to create a web server with CRUD endpoints for managing text notes, integrating with SQLite.
 
@@ -154,7 +152,7 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
 
 ---
 
-### Step 4: Create a Simple CRUD Web Page
+## Step 4: Create a Simple CRUD Web Page
 
 **Goal**: Add a basic HTML frontend to interact with your CRUD API, served by Rocket, to create a complete text-based web app.
 
@@ -180,104 +178,106 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
 
    Update the `rocket` function to include this route: `.mount("/", routes![index, list_notes, create_note])`.
 2. Create a `static/index.html` file with a form and table for CRUD operations:
-<xaiArtifact artifact_id="da8462e3-8639-4f27-b845-5d9663a133aa" artifact_version_id="1a52b194-8f6e-4bef-af07-7874d93b23ef" title="index.html" contentType="text/html">
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Notes CRUD App</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .error { color: red; }
-    </style>
-</head>
-<body>
-    <h1>Notes CRUD App</h1>
-    <form id="note-form">
-        <input type="number" id="id" placeholder="Note ID" required>
-        <input type="text" id="content" placeholder="Note Content" required>
-        <button type="submit">Create Note</button>
-    </form>
-    <div id="error" class="error"></div>
-    <h2>Notes</h2>
-    <table id="notes-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Content</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+   ```html
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <title>Notes CRUD App</title>
+       <style>
+           body { font-family: Arial, sans-serif; margin: 20px; }
+           table { border-collapse: collapse; width: 100%; }
+           th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+           th { background-color: #f2f2f2; }
+           .error { color: red; }
+       </style>
+   </head>
+   <body>
+       <h1>Notes CRUD App</h1>
+       <form id="note-form">
+           <input type="number" id="id" placeholder="Note ID" required>
+           <input type="text" id="content" placeholder="Note Content" required>
+           <button type="submit">Create Note</button>
+       </form>
+       <div id="error" class="error"></div>
+       <h2>Notes</h2>
+       <table id="notes-table">
+           <thead>
+               <tr>
+                   <th>ID</th>
+                   <th>Content</th>
+                   <th>Actions</th>
+               </tr>
+           </thead>
+           <tbody></tbody>
+       </table>
 
-    <script>
-        async function fetchNotes() {
-            const response = await fetch('/notes');
-            const notes = await response.json();
-            const tbody = document.querySelector('#notes-table tbody');
-            tbody.innerHTML = '';
-            notes.forEach(note => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${note.id}</td>
-                    <td>${note.content}</td>
-                    <td>
-                        <button onclick="updateNote(${note.id})">Update</button>
-                        <button onclick="deleteNote(${note.id})">Delete</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+       <script>
+           async function fetchNotes() {
+               const response = await fetch('/notes');
+               const notes = await response.json();
+               const tbody = document.querySelector('#notes-table tbody');
+               tbody.innerHTML = '';
+               notes.forEach(note => {
+                   const row = document.createElement('tr');
+                   row.innerHTML = `
+                       <td>${note.id}</td>
+                       <td>${note.content}</td>
+                       <td>
+                           <button onclick="updateNote(${note.id})">Update</button>
+                           <button onclick="deleteNote(${note.id})">Delete</button>
+                       </td>
+                   `;
+                   tbody.appendChild(row);
+               });
+           }
 
-        document.getElementById('note-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('id').value;
-            const content = document.getElementById('content').value;
-            const errorDiv = document.getElementById('error');
-            try {
-                const response = await fetch('/notes', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: parseInt(id), content })
-                });
-                if (!response.ok) throw new Error(await response.text());
-                document.getElementById('note-form').reset();
-                errorDiv.textContent = '';
-                fetchNotes();
-            } catch (err) {
-                errorDiv.textContent = err.message;
-            }
-        });
+           document.getElementById('note-form').addEventListener('submit', async (e) => {
+               e.preventDefault();
+               const id = document.getElementById('id').value;
+               const content = document.getElementById('content').value;
+               const errorDiv = document.getElementById('error');
+               try {
+                   const response = await fetch('/notes', {
+                       method: 'POST',
+                       headers: { 'Content-Type': 'application/json' },
+                       body: JSON.stringify({ id: parseInt(id), content })
+                   });
+                   if (!response.ok) throw new Error(await response.text());
+                   document.getElementById('note-form').reset();
+                   errorDiv.textContent = '';
+                   fetchNotes();
+               } catch (err) {
+                   errorDiv.textContent = err.message;
+               }
+           });
 
-        async function updateNote(id) {
-            const content = prompt('Enter new content:');
-            if (content) {
-                await fetch(`/notes/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, content })
-                });
-                fetchNotes();
-            }
-        }
+           async function updateNote(id) {
+               const content = prompt('Enter new content:');
+               if (content) {
+                   await fetch(`/notes/${id}`, {
+                       method: 'PUT',
+                       headers: { 'Content-Type': 'application/json' },
+                       body: JSON.stringify({ id, content })
+                   });
+                   fetchNotes();
+               }
+           }
 
-        async function deleteNote(id) {
-            await fetch(`/notes/${id}`, { method: 'DELETE' });
-            fetchNotes();
-        }
+           async function deleteNote(id) {
+               await fetch(`/notes/${id}`, { method: 'DELETE' });
+               fetchNotes();
+           }
 
-        fetchNotes();
-    </script>
-</body>
-</html>
-</xaiArtifact>
-3. Create a `static` directory in your project root, save `index.html` there, and test by visiting `http://localhost:8000`. Add PUT and DELETE endpoints to complete the CRUD functionality:
+           fetchNotes();
+       </script>
+   </body>
+   </html>
+   ```
+
+3. Create a `static` directory in your project root, save `index.html` there, and test by visiting `http://localhost:8000`. Add PUT and DELETE endpoints:
+
    ```rust
    #[put("/notes/<id>", data = "<note>")]
    async fn update_note(id: i32, note: Json<Note>, db: &State<SqlitePool>) -> Result<Json<Note>, &'static str> {
@@ -299,23 +299,26 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
            .map_err(|_| "Failed to delete note")?;
        Ok(())
    }
-
    ```
+
    Update the `rocket` function: `.mount("/", routes![index, list_notes, create_note, update_note, delete_note])`.
 
 **Time**: 7-10 days. Focus on integrating the frontend and backend.
 
 ---
 
-### Step 5: Deploy to a Linux Server
-**Goal**: Deploy your CRUD app to a Linux server (e.g., Ubuntu) and add a simple feature like note search to enhance functionality.
+## Step 5: Deploy to a Linux Server
+
+**Goal**: Deploy your CRUD app to a Linux server (e.g., Ubuntu) and add a note search feature to enhance functionality.
 
 **Lessons**:
+
 - Package your Rust app as a binary for Linux.
 - Configure a Linux server with a reverse proxy (Nginx) and SQLite persistence.
 - Implement a text search feature for notes.
 
 **Instructions for Hosting on Linux**:
+
 1. **Set Up a Linux Server**:
    - Use a cloud provider like DigitalOcean, AWS EC2, or Linode to provision an Ubuntu 22.04 server.
    - SSH into the server: `ssh user@your-server-ip`.
@@ -331,6 +334,7 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
    - Navigate to the project directory and build the release binary: `cd crud-app && cargo build --release`.
    - Create an SQLite database file: `sqlite3 notes.db "CREATE TABLE notes (id INTEGER PRIMARY KEY, content TEXT NOT NULL)"`.
    - Update your Rocket app to use the file-based database by changing the connection string in `setup_db`:
+
      ```rust
      async fn setup_db() -> Result<SqlitePool> {
          let pool = SqlitePool::connect("sqlite:notes.db").await?;
@@ -340,12 +344,14 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
          Ok(pool)
      }
      ```
+
    - Copy the `static` directory with `index.html` to the server.
    - Run the app: `./target/release/crud-app`. Test locally with `curl http://localhost:8000`.
 
 4. **Configure Nginx as a Reverse Proxy**:
    - Create an Nginx config file: `sudo nano /etc/nginx/sites-available/crud-app`.
    - Add:
+
      ```nginx
      server {
          listen 80;
@@ -357,12 +363,14 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
          }
      }
      ```
+
    - Enable the config: `sudo ln -s /etc/nginx/sites-available/crud-app /etc/nginx/sites-enabled/`.
    - Test and restart Nginx: `sudo nginx -t && sudo systemctl restart nginx`.
 
 5. **Run the App as a Service**:
    - Create a systemd service file: `sudo nano /etc/systemd/system/crud-app.service`.
    - Add:
+
      ```ini
      [Unit]
      Description=Rust CRUD App
@@ -377,6 +385,7 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
      [Install]
      WantedBy=multi-user.target
      ```
+
    - Enable and start the service: `sudo systemctl enable crud-app && sudo systemctl start crud-app`.
 
 6. **Verify Deployment**:
@@ -384,7 +393,9 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
    - Test CRUD operations using the HTML form.
 
 **Exercise**:
+
 - Add a `/search/<query>` endpoint to search notes by content:
+
   ```rust
   #[get("/search/<query>")]
   async fn search_notes(query: &str, db: &State<SqlitePool>) -> Json<Vec<Note>> {
@@ -397,7 +408,6 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
   ```
 
   Update the `rocket` function: `.mount("/", routes![index, list_notes, create_note, update_note, delete_note, search_notes])`.
-
 - Modify `index.html` to add a search form:
 
   ```html
@@ -431,18 +441,19 @@ A **text-based web application in Rust** with a focus on a **simple CRUD (Create
 
 ---
 
-### Complete Code Example
+## Complete Code Example
 
-For reference, here’s the full Rust code for your CRUD app (excluding `index.html`, already provided):
-<xaiArtifact artifact_id="5633f373-496d-4f95-8ac6-8415f54b2a32" artifact_version_id="fab8666c-ce60-4f2e-ba2e-3d34d3f449f4" title="main.rs" contentType="text/rust">
-# [macro_use] extern crate rocket;
+Below is the full Rust code for the CRUD app (excluding `index.html`, included in Step 4):
+
+```rust
+#[macro_use] extern crate rocket;
 use rocket::serde::{json::Json, Serialize, Deserialize};
 use rocket::State;
 use rocket::fs::NamedFile;
 use sqlx::{SqlitePool, Result};
 use std::path::{Path, PathBuf};
 
-# [derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 struct Note {
     id: i32,
     content: String,
@@ -456,12 +467,12 @@ async fn setup_db() -> Result<SqlitePool> {
     Ok(pool)
 }
 
-# [get("/")]
+#[get("/")]
 async fn index() -> Option<NamedFile> {
     NamedFile::open(Path::new("static/index.html")).await.ok()
 }
 
-# [get("/notes")]
+#[get("/notes")]
 async fn list_notes(db: &State<SqlitePool>) -> Json<Vec<Note>> {
     let notes = sqlx::query_as!(Note, "SELECT id, content FROM notes")
         .fetch_all(db)
@@ -470,7 +481,7 @@ async fn list_notes(db: &State<SqlitePool>) -> Json<Vec<Note>> {
     Json(notes)
 }
 
-# [post("/notes", data = "<note>")]
+#[post("/notes", data = "<note>")]
 async fn create_note(note: Json<Note>, db: &State<SqlitePool>) -> Result<Json<Note>, &'static str> {
     if note.content.is_empty() {
         return Err("Content cannot be empty");
@@ -482,7 +493,7 @@ async fn create_note(note: Json<Note>, db: &State<SqlitePool>) -> Result<Json<No
     Ok(note)
 }
 
-# [put("/notes/<id>", data = "<note>")]
+#[put("/notes/<id>", data = "<note>")]
 async fn update_note(id: i32, note: Json<Note>, db: &State<SqlitePool>) -> Result<Json<Note>, &'static str> {
     if note.content.is_empty() {
         return Err("Content cannot be empty");
@@ -494,7 +505,7 @@ async fn update_note(id: i32, note: Json<Note>, db: &State<SqlitePool>) -> Resul
     Ok(note)
 }
 
-# [delete("/notes/<id>")]
+#[delete("/notes/<id>")]
 async fn delete_note(id: i32, db: &State<SqlitePool>) -> Result<(), &'static str> {
     sqlx::query!("DELETE FROM notes WHERE id = ?", id)
         .execute(db)
@@ -503,7 +514,7 @@ async fn delete_note(id: i32, db: &State<SqlitePool>) -> Result<(), &'static str
     Ok(())
 }
 
-# [get("/search/<query>")]
+#[get("/search/<query>")]
 async fn search_notes(query: &str, db: &State<SqlitePool>) -> Json<Vec<Note>> {
     let notes = sqlx::query_as!(Note, "SELECT id, content FROM notes WHERE content LIKE ?", format!("%{}%", query))
         .fetch_all(db)
@@ -512,21 +523,23 @@ async fn search_notes(query: &str, db: &State<SqlitePool>) -> Json<Vec<Note>> {
     Json(notes)
 }
 
-# [launch]
-async fn rocket() -> _{
+#[launch]
+async fn rocket() -> _ {
     let pool = setup_db().await.expect("Failed to setup database");
     rocket::build()
         .manage(pool)
         .mount("/", routes![index, list_notes, create_note, update_note, delete_note, search_notes])
 }
-</xaiArtifact>
+```
 
 ---
 
-### Tips for Success
+## Tips for Success
 
 - **Test Locally**: Use `curl` or Postman to test API endpoints (e.g., `curl -X POST -H "Content-Type: application/json" -d '{"id":1,"content":"Test note"}' http://localhost:8000/notes`).
-- **Debug**: Add `env_logger` for debugging (`[dependencies] env_logger = "0.10"`) and initialize it in `main.rs`.
+- **Debug**: Add `env_logger` (`[dependencies] env_logger = "0.10"`) and initialize it in `main.rs` for debugging.
 - **Security**: Validate inputs to prevent SQL injection (SQLx sanitizes queries, but always check user input).
-- **Linux Deployment**: Ensure your server has enough memory (at least 1GB RAM) for Rust compilation.
-- **Resources**: Refer to Rocket’s docs (rocket.rs), SQLx’s GitHub, and DigitalOcean’s tutorials for Linux setup.
+- **Linux Deployment**: Ensure your server has at least 1GB RAM for Rust compilation.
+- **Resources**: Refer to [Rocket’s documentation](https://rocket.rs), [SQLx’s GitHub](https://github.com/launchbadge/sqlx), and [DigitalOcean tutorials](https://www.digitalocean.com/community) for Linux setup.
+
+By the end of this plan, you’ll have a fully functional CRUD web app with a simple HTML interface, deployed on a Linux server. Happy coding!
